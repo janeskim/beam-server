@@ -1,13 +1,17 @@
 """ App module for Heroku """
 import os
 
+from flask_bcrypt import Bcrypt
+
 from src import create_app
 from src.db import db_session
-from src.hello import hello_blueprint
+from src.blueprints import user
 
 
 app = create_app()
-app.register_blueprint(hello_blueprint)
+bcrypt = Bcrypt(app)
+
+app.register_blueprint(user.bp)
 
 # app.config.from_object(os.environ.get('APP_SETTINGS', "config.DevelopmentConfig"))
 app.config.from_object(os.environ['APP_SETTINGS'])
