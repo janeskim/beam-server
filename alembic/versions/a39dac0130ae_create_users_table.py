@@ -25,7 +25,7 @@ def upgrade():
         sa.Column('updated_at', sa.DateTime(), nullable=False),
         sa.Column('email', sa.String(length=255), nullable=False),
         sa.Column('username', sa.String(length=255), nullable=False),
-        sa.Column('password', sa.String(length=255), nullable=False),
+        sa.Column('_password', sa.String(length=255), nullable=False),
     )
 
 def downgrade():
