@@ -3,13 +3,13 @@ import os
 
 from src import create_app
 from src.db import db_session
-from src.hello import hello_blueprint
+from src.blueprints import user
 
 
 app = create_app()
-app.register_blueprint(hello_blueprint)
 
-# app.config.from_object(os.environ.get('APP_SETTINGS', "config.DevelopmentConfig"))
+app.register_blueprint(user.bp)
+
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
