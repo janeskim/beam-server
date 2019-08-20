@@ -4,7 +4,7 @@ import json
 from flask import Blueprint, request
 
 from src.db import db_session
-from src.models.user import User
+from src.models.user import User, user_schema, users_schema
 
 
 bp = Blueprint('users', __name__)
@@ -16,10 +16,7 @@ def index():
     View function to return all users
     """
     users = db_session.query(User).all()
-
-    results = [{'id': value.id} for value in users]
-
-    return (json.dumps(results), 200, {'content_type': 'application/json'})
+    return (json.dumps(users_schema.dump(users)), 200, {'content_type': 'application/json'})
 
 
 @bp.route('/users/<int:user_id>')
@@ -33,7 +30,7 @@ def get(user_id):
         error = "User id {0} doesn't exist.".format(user_id)
         return (json.dumps(error), 404, {'content-type': 'application/json'})
 
-    return (json.dumps(user), 200, {'content-type': 'application/json'})
+    return (json.dumps(user_schema.dump(user)), 200, {'content-type': 'application/json'})
 
 
 @bp.route('/register', methods=['POST'])
@@ -60,6 +57,6 @@ def register():
         user = User(username=username, email=email, password=password)
         db_session.add(user)
         db_session.commit()
-        return (json.dumps(user), 200, {'content-type': 'application/json'})
+        return (json.dumps(user_schema.dump(user)), 200, {'content-type': 'application/json'})
 
     return (json.dumps(error), 403, {'content-type': 'application/json'})

@@ -1,6 +1,7 @@
 """ User model """
 import datetime
 
+from marshmallow import fields, post_load, Schema
 from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -23,9 +24,6 @@ class User(Base):
     username = Column(String(255), nullable=False)
     _password = Column(String(255), nullable=False)
 
-    def __repr__(self):
-        return "<User(id='%s', email='%s' username='%s')>" % (self.id, self.email, self.username)
-
     @property
     def password(self):
         """ Getter for private _password property """
@@ -36,3 +34,16 @@ class User(Base):
         """ Setter to hash password property """
         bcrypt = Bcrypt()
         self._password = bcrypt.generate_password_hash(plaintext).decode('utf-8')
+
+
+class UserSchema(Schema):
+    """ User schema to serialize """
+    id = fields.Integer(dump_only=True)
+    created_at = fields.DateTime(dump_only=True)
+    updated_at = fields.DateTime(dump_only=True)
+    email = fields.String()
+    username = fields.String()
+
+
+user_schema = UserSchema()
+users_schema = UserSchema(many=True)
