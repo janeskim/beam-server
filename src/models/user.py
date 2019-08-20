@@ -1,30 +1,22 @@
 """ User model """
-import datetime
-
-from sqlalchemy import Column, DateTime, Integer, String
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, String
+from sqlalchemy.orm import relationship
 from marshmallow import Schema, ValidationError, fields, post_load, validates
 
 from flask_bcrypt import Bcrypt
 
 from src.db import db_session
+from src.models.base_model import BaseModel
 
 
-Base = declarative_base()
-
-class User(Base):
+class User(BaseModel):
     """ User model """
     __tablename__ = 'users'
-    id = Column(Integer, primary_key=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
-    updated_at = Column(
-        DateTime,
-        default=datetime.datetime.utcnow,
-        onupdate=datetime.datetime.utcnow
-    )
     email = Column(String(255), unique=True, nullable=False)
     username = Column(String(255), nullable=False)
     _password = Column(String(255), nullable=False)
+
+    colors = relationship('Color')
 
     @property
     def password(self):
