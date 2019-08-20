@@ -54,7 +54,7 @@ class UserSchema(Schema):
             raise ValidationError('Email is already registered.')
 
     @post_load
-    def make_object(self, data):
+    def make_object(self, data, **kwargs):
         """ Convert private attribute upon load """
         return User(**data)
 
