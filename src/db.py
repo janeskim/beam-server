@@ -6,7 +6,6 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 
 
 engine = create_engine(
-    # os.environ.get('DATABASE_URL', "postgresql://localhost/beam"),
     os.environ['DATABASE_URL'],
     convert_unicode=True
 )

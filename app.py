@@ -10,7 +10,6 @@ app = create_app()
 
 app.register_blueprint(user.bp)
 
-# app.config.from_object(os.environ.get('APP_SETTINGS', "config.DevelopmentConfig"))
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
