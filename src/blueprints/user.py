@@ -1,7 +1,8 @@
 """ Blueprint to test db config """
 import json
 
-from flask import Blueprint, request
+from flask import Blueprint, jsonify, make_response, request
+from marshmallow import ValidationError
 
 from src.db import db_session
 from src.models.user import User, user_schema, users_schema
@@ -26,9 +27,9 @@ def get(user_id):
     """
     user = db_session.query(User).get(user_id)
 
-    if user is None:
+    if not user:
         error = "User id {0} doesn't exist.".format(user_id)
-        return (json.dumps(error), 404, {'content-type': 'application/json'})
+        return (json.dumps({'message': error}), 404, {'content-type': 'application/json'})
 
     return (json.dumps(user_schema.dump(user)), 200, {'content-type': 'application/json'})
 
@@ -38,25 +39,10 @@ def register():
     """
     View function to register new user
     """
-    data = request.get_json()
-    email = data.get('email')
-    username = data.get('username')
-    password = data.get('password')
-    error = None
-
-    if not email:
-        error = "Email is required."
-    elif not username:
-        error = "Username is required."
-    elif not password:
-        error = "Password is required."
-    elif len(db_session.query(User).filter_by(email=email).all()) > 0:
-        error = 'User {} is already registered.'.format(email)
-
-    if error is None:
-        user = User(username=username, email=email, password=password)
+    try:
+        user = user_schema.load(request.get_json())
         db_session.add(user)
         db_session.commit()
         return (json.dumps(user_schema.dump(user)), 200, {'content-type': 'application/json'})
-
-    return (json.dumps(error), 403, {'content-type': 'application/json'})
+    except ValidationError as err:
+        return make_response(jsonify({'message': err.messages}), 422)
