@@ -1,4 +1,4 @@
-""" Blueprint to test db config """
+""" Blueprint for users """
 import json
 
 from flask import Blueprint, jsonify, make_response, request
