@@ -17,6 +17,7 @@ class User(BaseModel):
     _password = Column(String(255), nullable=False)
 
     colors = relationship('Color')
+    moods = relationship('Mood')
 
     @property
     def password(self):
