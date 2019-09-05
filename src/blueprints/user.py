@@ -1,11 +1,15 @@
 """ Blueprint for users """
+import os
+
+from datetime import datetime, timedelta
 import json
+import jwt
 
 from flask import Blueprint, jsonify, make_response, request
 from marshmallow import ValidationError
 
 from src.db import db_session
-from src.models.user import User, user_schema, users_schema
+from src.models.user import User, login_user_schema, user_schema, users_schema
 
 
 bp = Blueprint('users', __name__)
@@ -44,5 +48,33 @@ def register():
         db_session.add(user)
         db_session.commit()
         return (json.dumps(user_schema.dump(user)), 200, {'content-type': 'application/json'})
+    except ValidationError as err:
+        return make_response(jsonify({'message': err.messages}), 422)
+
+
+@bp.route('/login', methods=['POST'])
+def login():
+    """
+    View function to login user
+    """
+    try:
+        user = login_user_schema.load(request.get_json())
+
+        current_datetime = datetime.utcnow()
+        expiration_duration = timedelta(minutes=int(os.environ.get('JWT_DURATION', 0)))
+        payload = {
+            'id': user.id,
+            'exp': current_datetime + expiration_duration,
+            'iat': current_datetime,
+        }
+
+        auth_token = jwt.encode(payload, os.environ.get('JWT_SECRET'), algorithm='HS256')
+
+        response_header = {
+            'content-type': 'application/json',
+            'authorization': auth_token.decode(),
+        }
+
+        return (json.dumps(user_schema.dump(user)), 200, response_header)
     except ValidationError as err:
         return make_response(jsonify({'message': err.messages}), 422)
